@@ -139,7 +139,7 @@ fi
 # Based on stopwatch-timing the formatting of a 2 GB /data partition on a
 # SanDisk class 4 SD card on the Nook Color
 segment_time=$(div_round_up $((5 * $data_sectors)) 2097152)
-autofill_progress 0.4 $segment_time
+autofill_progress 0.2 $segment_time
 
 # XXX: use mke2fs for better control over layout?
 #make_ext4fs -a data "$BLKDEV"p3
@@ -169,7 +169,7 @@ fi
 # Based on stopwatch-timing the formatting of a 4.5 GB /sdcard partition on a
 # SanDisk class 4 SD card on the Nook Color
 segment_time=$(div_round_up $sdcard_sectors 4194304)
-autofill_progress 0.4 $segment_time
+autofill_progress 0.2 $segment_time
 
 # Ensure alignment of the FAT data section to an eraseblock boundary
 # Assume the largest common eraseblock size, which ensures alignment on smaller
@@ -183,10 +183,36 @@ chmod 0755 /tmp/mkfs.fat
 
 set_progress 1.0
 
+# Install Google apps, if a package is present
+ui_print "Installing Google apps..."
+mount /boot
+gapps_zips="`echo /boot/gapps*.zip`"
+if [ x"$gapps_zips" != x"/boot/gapps*.zip" ]; then
+	# Install the Google apps
+	for zip in $gapps_zips; do
+		mkdir -p /tmp/gapps
+		unzip "$zip" META-INF/com/google/android/update-binary -d /tmp/gapps
+		chmod 0755 /tmp/gapps/META-INF/com/google/android/update-binary
+		/tmp/gapps/META-INF/com/google/android/update-binary "$1" "$cmdfd" "$zip"
+		result=$?
+		if [ $result -ne 0 ]; then
+			ui_print "Google apps installation failed: status $result"
+			sleep 5
+		fi
+		rm -rf /tmp/gapps
+		rm -f "$zip"
+		# Only install one Google apps package!
+		break
+	done
+else
+	ui_print "No Google apps found -- skipping."
+	progress_segment 0.4
+	set_progress 1.0
+fi
+
 # Make sure the recovery doesn't boot next time
 ui_print "Configuring system boot..."
 progress_segment 0.05
-mount /boot
 mv /boot/uImage.real /boot/uImage
 mv /boot/uRamdisk.real /boot/uRamdisk
 rm -f /boot/recovery-commands /boot/postrecoveryboot.sh /boot/sdcard-first-run.zip

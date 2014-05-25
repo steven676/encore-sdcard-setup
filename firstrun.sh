@@ -175,11 +175,11 @@ autofill_progress 0.4 $segment_time
 # Assume the largest common eraseblock size, which ensures alignment on smaller
 # eraseblock boundaries as well
 ERASEBLOCK_SIZE=4194304
-cluster_size="`select_cluster_size $sdcard_sectors $ERASEBLOCK_SIZE cluster_align`"
-reserved_sectors="`align_reserved_sectors $sdcard_sectors $ERASEBLOCK_SIZE $cluster_size cluster_align`"
+cluster_size="`select_cluster_size $sdcard_sectors $ERASEBLOCK_SIZE`"
+reserved_sectors="`align_reserved_sectors $sdcard_sectors $ERASEBLOCK_SIZE $cluster_size`"
 
 chmod 0755 /tmp/mkfs.fat
-/tmp/mkfs.fat -F 32 -s $(($cluster_size/512)) -h 0 -R $reserved_sectors "$BLKDEV"p4 || fail "Formatting /sdcard failed!"
+/tmp/mkfs.fat -F 32 -s $(($cluster_size/512)) -h 0 -R $reserved_sectors -a "$BLKDEV"p4 || fail "Formatting /sdcard failed!"
 
 set_progress 1.0
 

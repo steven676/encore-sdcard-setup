@@ -4,12 +4,12 @@ DESTDIR ?= out
 CROSS_COMPILE ?= arm-linux-gnueabi-
 CC := $(CROSS_COMPILE)gcc
 STRIP ?= $(CROSS_COMPILE)strip
-OPT_CFLAGS ?= -mcpu=cortex-a8 -mfloat-abi=softfp -mfpu=neon -mthumb
+OPT_CFLAGS ?= -mcpu=cortex-a8 -mthumb
 
 all: install
 
 mkfs.fat:
-	$(MAKE) CC="$(CC)" CFLAGS="-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 $(OPT_CFLAGS)" LDFLAGS="-static" -C $(DOSFSTOOLS_SRC)
+	CC="$(CC)" CFLAGS="-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 $(OPT_CFLAGS) $(CFLAGS)" LDFLAGS="-static $(LDFLAGS)" $(MAKE) -C $(DOSFSTOOLS_SRC)
 	cp $(DOSFSTOOLS_SRC)/mkfs.fat .
 
 install: mkfs.fat

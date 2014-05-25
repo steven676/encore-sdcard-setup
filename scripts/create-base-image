@@ -1,0 +1,46 @@
+#!/bin/sh
+
+# create a base SD card image which can be used for running Android on encore
+
+if [ -z "$1" ]; then
+	echo "Usage: $0 image-file"
+	exit 0
+fi
+
+# Create a 1GB sparse file to hold the image
+dd if=/dev/zero of="$1" bs=512 count=1 seek=2097151
+
+# Partition the image into a 256 MB /boot and 768 MB /system
+fdisk -c=dos "$1" <<-EOF
+	n
+	p
+	1
+	63
+	524287
+	c
+	n
+	p
+	2
+	524288
+
+	a
+	1
+	t
+	1
+	0c
+	w
+	EOF
+
+# Set up a loopback device for the /boot partition
+loopdev="`losetup -f`"
+[ "$loopdev" ] || exit 1
+losetup -o $((63*512)) --sizelimit $(((524288-63)*512)) "$loopdev" "$1"
+
+# Format the /boot partition
+# The parameters are selected to ensure the data area begins on a 4MB boundary
+mkdosfs -F 32 -s 4 -h 0 -R 6111 -a "$loopdev"
+
+# Clean up
+losetup -d "$loopdev"
+
+exit 0

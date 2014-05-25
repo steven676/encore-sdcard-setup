@@ -197,8 +197,7 @@ if [ x"$gapps_zips" != x"/boot/gapps*.zip" ]; then
 		/tmp/gapps/META-INF/com/google/android/update-binary "$recoveryapi" "$cmdfd" "$zip"
 		result=$?
 		if [ $result -ne 0 ]; then
-			ui_print "Google apps installation failed: status $result"
-			sleep 5
+			fail "Google apps installation failed: status $result"
 		fi
 		rm -rf /tmp/gapps
 		rm -f "$zip"

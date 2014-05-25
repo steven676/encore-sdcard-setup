@@ -3,3 +3,4 @@
 mkfs.fat
 out
 dosfstools
+dosfstools-*

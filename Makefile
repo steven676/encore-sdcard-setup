@@ -25,4 +25,4 @@ clean:
 	rm -f mkfs.fat
 	$(MAKE) -C $(DOSFSTOOLS_SRC) distclean
 
-.PHONY: install clean
+.PHONY: all install clean

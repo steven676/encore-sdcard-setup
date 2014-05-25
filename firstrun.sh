@@ -7,9 +7,10 @@
 # As of API version 2, command-fd is a file descriptor to which we can write
 # commands to be interpreted by the recovery.
 
-# Ensure we're being used with recovery API version 2
-[ "$1" ] || exit 1
-[ "$1" -eq 2 ] || exit 1
+# Ensure we're being used with a supported recovery API version
+recoveryapi="$1"
+[ "$recoveryapi" ] || exit 1
+[ "$recoveryapi" -eq 2 ] || [ "$recoveryapi" -eq 3 ] || exit 1
 
 ui_print() {
 	echo "ui_print $1" >&$cmdfd
@@ -193,7 +194,7 @@ if [ x"$gapps_zips" != x"/boot/gapps*.zip" ]; then
 		mkdir -p /tmp/gapps
 		unzip "$zip" META-INF/com/google/android/update-binary -d /tmp/gapps
 		chmod 0755 /tmp/gapps/META-INF/com/google/android/update-binary
-		/tmp/gapps/META-INF/com/google/android/update-binary "$1" "$cmdfd" "$zip"
+		/tmp/gapps/META-INF/com/google/android/update-binary "$recoveryapi" "$cmdfd" "$zip"
 		result=$?
 		if [ $result -ne 0 ]; then
 			ui_print "Google apps installation failed: status $result"

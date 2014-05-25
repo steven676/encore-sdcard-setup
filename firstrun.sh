@@ -68,27 +68,27 @@ unzip "$updatezip" $UNPACK_FILES -d /tmp || fail "Couldn't get files from update
 
 . /tmp/align.sh
 
-# Get SD card size
-cardsize="`fdisk -ul "$BLKDEV" | grep "^Disk $BLKDEV:" | sed -e 's/^.*: \(.*\) MB,.*$/\1/'`"
+# Get SD card size in sectors
+cardsize="`fdisk -ul "$BLKDEV" | grep 'total .* sectors' | sed -e 's/^.* total \(.*\) sectors$/\1/'`"
 if [ -z "$cardsize" ] || [ "$cardsize" -le 0 ]; then
 	fail "Couldn't get valid SD card size!"
 fi
 
 # Choose partition sizes based on the SD card size
-if [ "$cardsize" -lt 3920 ]; then
+if [ "$cardsize" -lt 7500000 ]; then
 	ui_print "This SD card is too small to support an Android installation."
 	ui_print "Use an SD card that's 4 GB or bigger."
 	fail
-elif [ "$cardsize" -le 8192 ]; then
+elif [ "$cardsize" -le 16777216 ]; then
 	# 4-8 GB: /data 2 GB, remainder /sdcard
 	data_sectors=4194304
 	sdcard_sectors=0
-elif [ "$cardsize" -le 36864 ]; then
-	# 8 GB < size < 36 GB: /data 4 GB, remainder /sdcard
+elif [ "$cardsize" -le 77594624 ]; then
+	# 8 GB < size < 37 GB: /data 4 GB, remainder /sdcard
 	data_sectors=8388608
 	sdcard_sectors=0
 else
-	# size > 36 GB: 32 GB /sdcard, remainder /data
+	# size > 37 GB: 32 GB /sdcard, remainder /data
 	data_sectors=0
 	sdcard_sectors=67108864
 fi

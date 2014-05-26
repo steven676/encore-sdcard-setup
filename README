@@ -31,3 +31,15 @@ http://daniel-baumann.ch/software/dosfstools/
    zip -r ../out.zip .
    cd ..
    java -jar signapk.jar -w /path/to/android/source/tree/build/target/product/security/testkey.x509.pem /path/to/android/source/tree/build/target/product/security/testkey.pk8 out.zip sdcard-first-run.zip
+
+== License information ==
+
+The first-run setup script is available under GPLv2+.
+
+align.sh comes from my FAT flash alignment tool
+(https://github.com/steven676/fat-flash-aligner) and is also available
+under GPLv2+.
+
+Note that dosfstools (as of this writing) is licensed GPLv3+, so you
+must comply with the terms of GPLv3 with respect to mkfs.fat when
+distributing the final result.

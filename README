@@ -1,0 +1,33 @@
+This is a first-run setup script for an SD card installation of Android
+for the Nook Color, along with scripts to run it on recovery boot and
+tools for creating such SD cards.
+
+== Building the first-run setup OTA package ==
+
+You will need a GNU/Linux toolchain for ARM (an Android toolchain will
+not do).  CodeSourcery has GNU/Linux cross compiler toolchains for ARM
+available for download; you can also use Emdebian toolchains, or (if you
+have a Linux install/chroot on an ARM box) a native ARM toolchain.
+
+You will also need a copy of the dosfstools source:
+http://daniel-baumann.ch/software/dosfstools/
+
+1. Unpack (or git clone) the dosfstools source somewhere.
+2. Run make:
+
+   CROSS_COMPILE=arm-linux-gnueabi- DOSFSTOOLS_SRC=/path/to/dosfstools make
+
+   (Replace the value of DOSFSTOOLS_SRC with the location of the
+   unpacked dosfstools source.  CROSS_COMPILE should be set to the
+   common prefix of your cross toolchain's tools: for example, if your
+   cross compiler is /path/to/toolchain/arm-linux-gnueabi-gcc, then set
+   CROSS_COMPILE to /path/to/toolchain/arm-linux-gnueabi- .)
+
+   You'll get an unpacked Android OTA under out/ .
+3. Zip up everything under out/, and use SignApk to sign the resulting
+   file:
+
+   cd out
+   zip -r ../out.zip .
+   cd ..
+   java -jar signapk.jar -w /path/to/android/source/tree/build/target/product/security/testkey.x509.pem /path/to/android/source/tree/build/target/product/security/testkey.pk8 out.zip sdcard-first-run.zip
